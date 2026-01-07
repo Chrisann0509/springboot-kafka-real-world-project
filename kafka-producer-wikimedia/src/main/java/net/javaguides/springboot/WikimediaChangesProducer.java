@@ -2,6 +2,7 @@ package net.javaguides.springboot;
 
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.EventHandler;
+import okhttp3.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +27,19 @@ public class WikimediaChangesProducer {
         String topic = topicName;
 
         // to read real time stream data for wikimedia, we use event handler
-        EventHandler eventHandler= new WikimediaChangesHandler(kafkaTemplate,topicName);
+        EventHandler eventHandler = new WikimediaChangesHandler(kafkaTemplate, topicName);
         String url = "https://stream.wikimedia.org/v2/stream/recentchange";
-        EventSource.Builder builder = new EventSource.Builder(eventHandler, URI.create(url));
-        EventSource eventSource = builder.build();
+        Headers headers = new Headers.Builder()
+                .add("User-Agent", "SpringBoot-Kafka-Producer/1.0 (your-email@example.com)")
+                .build();
+        EventSource eventSource = new EventSource.Builder(
+                eventHandler,
+                URI.create(url))
+                .headers(headers)
+                .build();
+
         eventSource.start();
+        LOGGER.info("EventSource started");
         TimeUnit.MINUTES.sleep(10);
     }
 }

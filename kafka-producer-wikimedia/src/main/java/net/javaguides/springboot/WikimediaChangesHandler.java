@@ -19,7 +19,7 @@ public class WikimediaChangesHandler implements EventHandler {
 
     @Override
     public void onOpen() throws Exception {
-
+        LOGGER.info("Connected to Wikimedia stream");
     }
 
     @Override
@@ -40,6 +40,6 @@ public class WikimediaChangesHandler implements EventHandler {
 
     @Override
     public void onError(Throwable throwable) {
-
+        LOGGER.error("EventSource error", throwable);
     }
 }
